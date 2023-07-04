@@ -76,6 +76,18 @@ window.addEventListener("load", function(){
             this.collisionY += this.speedY * this.speedModifier;
             this.spriteX = this.collisionX - this.width * 0.5;
             this.spriteY = this.collisionY - this.height * 0.5 - 100;
+            if (this.collisionX < this.collisionRadius) {
+                this.collisionX = this.collisionRadius;
+            }
+            else if(this.collisionX > this.game.width - this.collisionRadius){
+                this.collisionX = this.game.width - this.collisionRadius;
+            }
+            if(this.collisionY < this.game.topMargin + this.collisionRadius){
+                this.collisionY = this.game.topMargin + this.collisionRadius;
+            }
+            else if(this.collisionY > this.game.height - this.collisionRadius){
+                this.collisionY = this.game.height - this.collisionRadius;
+            }
             this.game.obstacles.forEach(obstacle => {
                 let [collision ,distance, sumOfRadii, dx, dy] = this.game.checkCollision(this, obstacle);
                 if (collision) {
@@ -187,7 +199,7 @@ window.addEventListener("load", function(){
                         overlap = true;
                     }
                 });
-                const margin = testObstacle.collisionRadius * 2;
+                const margin = testObstacle.collisionRadius * 3;
                 if (!overlap &&
                      testObstacle.spriteX > 0 &&
                      testObstacle.spriteX < this.width - testObstacle.width && 
