@@ -178,6 +178,15 @@ window.addEventListener("load", function(){
         }
     }
 
+    class Larva{
+        constructor(game, x, y){
+            this.game = game;
+            this.collisionX = x;
+            this.collisionY = y;
+            this.collisionRadius = 30;
+        }
+    }
+
     class Enemy{
         constructor(game){
             this.game = game;
