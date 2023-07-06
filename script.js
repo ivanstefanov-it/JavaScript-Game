@@ -5,7 +5,7 @@ window.addEventListener("load", function(){
     canvas.height = 720;
     context.fillStyle = "white";
     context.lineWidth = 3;
-    context.strokeStyle = "white";
+    context.strokeStyle = "black";
     context.font = "40px Helvetica";
     context.textAlign = "center";
 
@@ -234,6 +234,9 @@ window.addEventListener("load", function(){
                 this.markedForDeletion = true;
                 this.game.removeGameObjects();
                 this.game.score++;
+                for (let i = 0; i < 3; i++) {
+                    this.game.particles.push(new Firefly(this.game, this.collisionX, this.collisionY, "yellow"));
+                }
             }
 
             let collisionObjects = [this.game.player, ...this.game.obstacles];
@@ -308,6 +311,50 @@ window.addEventListener("load", function(){
         }
     }
 
+    class Particle{
+        constructor(game, x, y, color){
+            this.game = game;
+            this.collisionX = x;
+            this.collisionY = y;
+            this.color = color;
+            this.radius = Math.floor(Math.random() * 10 + 5);
+            this.speedX = Math.random() * 6 - 3;
+            this.speedY = Math.random() * 2 + 0.5;
+            this.angle = 0;
+            this.va = Math.random() * 0.1 + 0.01;
+            this.markedForDeletion = false;
+        }
+
+        draw(context){
+            context.save();
+            context.fillStyle = this.color;
+            context.beginPath();
+            context.arc(this.collisionX, this.collisionY, this.radius, 0, Math.PI * 2);
+            context.fill();
+            context.stroke();
+            context.restore();
+        }
+    }
+
+    class Firefly extends Particle{
+        update(){
+            this.angle += this.va;
+            this.collisionX += this.speedX;
+            this.collisionY -= this.speedY;
+
+            if (this.collisionY < 0 - this.radius) {
+                this.markedForDeletion = true;
+                this.game.removeGameObjects();
+            }
+        }
+    }
+
+    class Spark extends Particle{
+        update(){
+            
+        }
+    }
+
     class Game {
         constructor(canvas){
             this.canvas = canvas;
@@ -327,6 +374,7 @@ window.addEventListener("load", function(){
             this.eggs = [];
             this.enemies = [];
             this.hatchlings = [];
+            this.particles = [];
             this.gameObjects = [];
             this.score = 0;
             this.lostHatchlings = 0;
@@ -362,7 +410,7 @@ window.addEventListener("load", function(){
         render(context, deltaTime){
             if (this.timer > this.interval) {
                 context.clearRect(0, 0, this.width, this.height);
-                this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings];
+                this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings, ...this.particles];
                 this.gameObjects.sort((a, b) => {
                     return a.collisionY - b.collisionY;
                 });
@@ -410,6 +458,7 @@ window.addEventListener("load", function(){
         removeGameObjects(){
             this.eggs = this.eggs.filter(object => !object.markedForDeletion);
             this.hatchlings = this.hatchlings.filter(object => !object.markedForDeletion);
+            this.particles = this.particles.filter(object => !object.markedForDeletion);
         }
 
         init(){
